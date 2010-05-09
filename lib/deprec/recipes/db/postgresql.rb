@@ -77,14 +77,15 @@ Capistrano::Configuration.instance(:must_exist).load do
       task :create_user, :roles => :db do
         cmd = "su - postgres -c \'createuser -P -D -A -E #{db_user}\'"
         sudo cmd do |channel, stream, data|
-          if data =~ /^Enter password for new/
+          case data
+          when /^Enter password for new/
             channel.send_data "#{db_password}\n" 
-          end
-          if data =~ /^Enter it again:/
+          when /^Enter it again:/
             channel.send_data "#{db_password}\n" 
-          end
-          if data =~ /^Shall the new role be allowed to create more new roles?/
+          when /^Shall the new role be allowed to create more new roles?/
             channel.send_data "n\n" 
+          when /ERROR:/
+            raise data
           end
         end
       end
