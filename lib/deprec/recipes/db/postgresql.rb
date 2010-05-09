@@ -84,8 +84,8 @@ Capistrano::Configuration.instance(:must_exist).load do
             channel.send_data "#{db_password}\n" 
           when /^Shall the new role be allowed to create more new roles?/
             channel.send_data "n\n" 
-          when /ERROR:/
-            raise data
+          when /ERROR:  role "postgres" already exist/
+            break
           end
         end
       end
